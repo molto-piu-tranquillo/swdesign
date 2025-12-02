@@ -1,592 +1,115 @@
 diff --git a/workspace/SourceCodes/patient_management.py b/workspace/SourceCodes/patient_management.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..69be685e4f9acdc933124ba072dc8cb1bfa9c178
+index 0000000000000000000000000000000000000000..eadb026940e71d1a4b4c6af84c8dc368744cdf5f
 --- /dev/null
 +++ b/workspace/SourceCodes/patient_management.py
-@@ -0,0 +1,586 @@
-+"""Patient management domain model for patient panel workflows.
+@@ -0,0 +1,109 @@
++"""환자 관리 로직.
 +
-+This module implements the patient management feature described in the
-+provided class diagram and responsibilities. It focuses on the core domain
-+objects (patients, risk snapshots, care goals, incentives, etc.) and the
-+service that coordinates patient panels.
++기존에 정의된 :mod:`user` 모듈의 클래스를 그대로 활용하고, 필요한 경우에만
++확장/상속을 통해 추가 기능을 제공한다. 불필요하게 새로운 사용자 클래스를
++정의하지 않고, 환자와 주치의 간의 관계나 데이터 기록을 관리하는 데 집중한다.
 +"""
 +
 +from __future__ import annotations
 +
-+from dataclasses import dataclass, field
-+from datetime import datetime
-+from typing import Dict, List, Optional
-+import tkinter as tk
-+from tkinter import ttk
-+import argparse
++from typing import Iterable, List, Optional
++
++from user import Data, Docter, Patient, User
 +
 +
-+@dataclass
-+class Doctor:
-+    """Simple representation of a doctor.
++class PatientManager:
++    """환자와 관련된 객체를 관리하는 도우미 클래스.
 +
-+    The existing code base does not provide a concrete doctor model, so this
-+    placeholder captures the minimum identifier and name fields required for
-+    the patient panel feature. Additional attributes can be added when the
-+    broader system models a doctor in more detail.
++    - 새로운 환자를 등록하고 조회한다.
++    - 환자에게 주치의를 배정한다.
++    - 건강 데이터(:class:`user.Data`)를 기록한다.
++
++    기존의 :class:`user.Patient`, :class:`user.Docter` 클래스를 재사용하며
++    추가적인 사용자 클래스 정의를 피한다.
 +    """
 +
-+    doctor_id: str
-+    name: str
++    def __init__(self, users: Optional[Iterable[User]] = None) -> None:
++        self._users: List[User] = list(users) if users else []
 +
-+
-+@dataclass
-+class RiskSnapshot:
-+    """Represents a patient's health status at a specific point in time."""
-+
-+    blood_pressure: str
-+    blood_sugar: str
-+    exercise: int
-+    sleep_hour: float
-+    smoke: bool
-+    alcohol: bool
-+    created_at: datetime = field(default_factory=datetime.utcnow)
-+
-+
-+@dataclass
-+class Comment:
-+    """Free-form note left on a patient panel."""
-+
-+    message: str
-+    created_at: datetime = field(default_factory=datetime.utcnow)
-+
-+
-+@dataclass
-+class CareGoal:
-+    """Target metrics the patient should work toward."""
-+
-+    target_weight: float
-+    target_bmi: float
-+    start_date: datetime
-+    target_bp: str
-+    target_sugar: str
-+    target_exercise: float
-+    target_sleep: float
-+    created_at: datetime = field(default_factory=datetime.utcnow)
-+
-+
-+@dataclass
-+class WarningFlagLog:
-+    """Record of a warning raised for a patient."""
-+
-+    reason: str
-+    level: str
-+    created_at: datetime = field(default_factory=datetime.utcnow)
-+
-+
-+@dataclass
-+class Incentive:
-+    """Gamification or reward event tied to patient behavior."""
-+
-+    event_id: str
-+    event_name: str
-+    incentive_point: int
-+    event_base: str
-+    status: bool
-+    status_updated: bool
-+    granted_at: datetime
-+
-+
-+@dataclass
-+class Patient:
-+    """Patient information and related health tracking objects."""
-+
-+    name: str
-+    picture: str
-+    bmi: float
-+    blood_pressure: str
-+    blood_sugar: str
-+    walking_avg: int
-+    sleeping_hour: int
-+    last_accessed: datetime
-+    risk_snapshots: List[RiskSnapshot] = field(default_factory=list)
-+    patient_panel_rows: List["PatientPanelRow"] = field(default_factory=list)
-+    care_goal: Optional[CareGoal] = None
-+    warning_flag_logs: List[WarningFlagLog] = field(default_factory=list)
-+    incentives: List[Incentive] = field(default_factory=list)
-+
-+    def get_current_risk_snapshot(self) -> Optional[RiskSnapshot]:
-+        """Return the most recent risk snapshot for the patient."""
-+
-+        if not self.risk_snapshots:
-+            return None
-+        return self.risk_snapshots[-1]
-+
-+    def make_warning_flag_log(self, reason: str, level: str) -> WarningFlagLog:
-+        """Create and store a new warning log entry for the patient."""
-+
-+        log = WarningFlagLog(reason=reason, level=level)
-+        self.warning_flag_logs.append(log)
-+        return log
-+
-+    def set_goal(self, goal: CareGoal) -> CareGoal:
-+        """Assign or replace the patient's active care goal."""
-+
-+        self.care_goal = goal
-+        return goal
-+
-+    def add_snapshot(self, risk_snapshot: RiskSnapshot) -> None:
-+        """Add a new risk snapshot for the patient."""
-+
-+        self.risk_snapshots.append(risk_snapshot)
-+
-+    def add_patient_panel_row(self, patient_panel_row: "PatientPanelRow") -> None:
-+        """Attach a patient panel row to the patient history."""
-+
-+        self.patient_panel_rows.append(patient_panel_row)
-+
-+    def add_incentive(self, incentive: Incentive) -> None:
-+        """Record a newly granted incentive for the patient."""
-+
-+        self.incentives.append(incentive)
-+
-+
-+@dataclass
-+class PatientPanelRow:
-+    """Single entry row that summarizes the patient's status."""
-+
-+    patient: Patient
-+    risk_snapshot: RiskSnapshot
-+    care_goal: Optional[CareGoal]
-+    warning_flag_log: Optional[WarningFlagLog]
-+    incentive: Optional[Incentive]
-+    created_at: datetime = field(default_factory=datetime.utcnow)
-+
-+
-+@dataclass
-+class PatientPanel:
-+    """Aggregates panel data for a patient under a specific doctor."""
-+
-+    doctor: Doctor
-+    patient: Patient
-+    patient_panel_rows: List[PatientPanelRow] = field(default_factory=list)
-+    comment: Optional[Comment] = None
-+    goal: Optional[CareGoal] = None
-+    given_evidence: bool = False
-+    created_at: datetime = field(default_factory=datetime.utcnow)
-+
-+    def open_panel(self) -> List[PatientPanelRow]:
-+        """Expose the current panel rows for the patient."""
-+
-+        return list(self.patient_panel_rows)
-+
-+    def add_patient_panel_row(self, patient_panel_row: PatientPanelRow) -> None:
-+        """Append a new patient panel row to the panel."""
-+
-+        self.patient_panel_rows.append(patient_panel_row)
-+        self.patient.add_patient_panel_row(patient_panel_row)
-+
-+
-+class PatientPanelService:
-+    """Service layer that manages patient panels for doctors."""
-+
-+    def __init__(self) -> None:
-+        self._patients: Dict[str, Patient] = {}
-+        self._panels: Dict[str, PatientPanel] = {}
-+
-+    def register_patient(self, patient_id: str, patient: Patient) -> None:
-+        """Register or replace a patient in the service registry."""
-+
-+        self._patients[patient_id] = patient
-+
-+    def get_patient(self, patient_id: str) -> Patient:
-+        """Return a registered patient or raise an error if missing."""
-+
-+        if patient_id not in self._patients:
-+            raise KeyError(f"Unknown patient id: {patient_id}")
-+        return self._patients[patient_id]
-+
-+    def get_panel(self, doctor: Doctor, patient_id: str) -> PatientPanel:
-+        """Return an existing panel or create a new one for the patient."""
-+
-+        patient = self.get_patient(patient_id)
-+
-+        if patient_id not in self._panels:
-+            self._panels[patient_id] = PatientPanel(
-+                doctor=doctor, patient=patient
-+            )
-+        elif self._panels[patient_id].doctor != doctor:
-+            raise ValueError("Panel already exists for a different doctor")
-+        return self._panels[patient_id]
-+
-+    def set_patient_goal(self, patient_id: str, goal: CareGoal) -> CareGoal:
-+        """Persist the care goal on the patient and existing panel."""
-+
-+        patient = self.get_patient(patient_id)
-+        patient.set_goal(goal)
-+
-+        if patient_id in self._panels:
-+            self._panels[patient_id].goal = goal
-+
-+        return goal
-+
-+    def log_warning(self, patient_id: str, reason: str, level: str) -> WarningFlagLog:
-+        """Create a warning flag entry for the patient."""
-+
-+        patient = self.get_patient(patient_id)
-+        return patient.make_warning_flag_log(reason=reason, level=level)
-+
-+    def add_incentive(self, patient_id: str, incentive: Incentive) -> Incentive:
-+        """Attach an incentive to the patient record."""
-+
-+        patient = self.get_patient(patient_id)
-+        patient.add_incentive(incentive)
-+        return incentive
-+
-+    def add_panel_row(
++    def add_patient(
 +        self,
-+        doctor: Doctor,
-+        patient_id: str,
-+        risk_snapshot: RiskSnapshot,
-+        care_goal: Optional[CareGoal] = None,
-+        warning_flag_log: Optional[WarningFlagLog] = None,
-+        incentive: Optional[Incentive] = None,
-+        comment: Optional[str] = None,
-+        given_evidence: Optional[bool] = None,
-+    ) -> PatientPanelRow:
-+        """Append a new patient panel row and keep patient artifacts in sync."""
++        name: str,
++        age: int,
++        gender: str,
++        user_id: str,
++        password: str,
++        phone_number: str,
++        email: str,
++    ) -> Patient:
++        """새로운 환자를 생성해 내부 목록에 추가한다."""
 +
-+        panel = self.get_panel(doctor, patient_id)
-+        patient = panel.patient
-+
-+        patient.add_snapshot(risk_snapshot)
-+        if care_goal is not None:
-+            patient.set_goal(care_goal)
-+            panel.goal = care_goal
-+        if warning_flag_log is not None:
-+            patient.warning_flag_logs.append(warning_flag_log)
-+        if incentive is not None:
-+            patient.add_incentive(incentive)
-+
-+        panel_row = PatientPanelRow(
-+            patient=patient,
-+            risk_snapshot=risk_snapshot,
-+            care_goal=care_goal,
-+            warning_flag_log=warning_flag_log,
-+            incentive=incentive,
++        patient = Patient(
++            name,
++            age,
++            gender,
++            user_id,
++            password,
++            phone_number,
++            email,
++            "개인 사용자",
 +        )
-+        panel.add_patient_panel_row(panel_row)
++        self._users.append(patient)
++        return patient
 +
-+        if comment is not None:
-+            panel.comment = Comment(message=comment)
-+        if given_evidence is not None:
-+            panel.given_evidence = given_evidence
++    def register_existing_user(self, user: User) -> None:
++        """외부에서 생성된 사용자 객체를 목록에 추가한다."""
 +
-+        return panel_row
++        self._users.append(user)
 +
-+    def get_panel_rows(self, patient_id: str) -> List[PatientPanelRow]:
-+        """Retrieve panel rows for the patient, if a panel exists."""
++    def _find_patient(self, user_id: str) -> Optional[Patient]:
++        for user in self._users:
++            if isinstance(user, Patient) and user.getId() == user_id:
++                return user
++        return None
 +
-+        panel = self._panels.get(patient_id)
-+        if panel is None:
-+            return []
-+        return panel.open_panel()
++    def assign_doctor(self, patient_id: str, doctor: Docter) -> bool:
++        """환자에게 주치의를 배정한다.
 +
-+    def save_patient_panel(
-+        self,
-+        patient_id: str,
-+        comment: Optional[str],
-+        goal: Optional[CareGoal],
-+        given_evidence: bool,
-+    ) -> PatientPanel:
-+        """Persist comment, goal, and evidence flag for the patient's panel."""
++        반환값은 배정 성공 여부이다.
++        """
 +
-+        if patient_id not in self._panels:
-+            raise KeyError(f"Unknown patient id: {patient_id}")
++        patient = self._find_patient(patient_id)
++        if not patient:
++            return False
 +
-+        panel = self._panels[patient_id]
-+        panel.comment = Comment(message=comment) if comment else None
-+        panel.goal = goal
-+        panel.given_evidence = given_evidence
-+        return panel
++        patient._Patient__mainDocter = doctor  # 기존 속성을 그대로 활용
++        return True
 +
++    def add_health_record(self, patient_id: str, data: Data) -> bool:
++        """환자의 건강 데이터를 기록한다."""
 +
-+class PatientPanelFrame:
-+    """Presentation boundary for patient panel interactions."""
++        patient = self._find_patient(patient_id)
++        if not patient:
++            return False
 +
-+    def __init__(self, patient_panel_service: PatientPanelService):
-+        self.patient_panel_service = patient_panel_service
++        patient.addData(data)
++        return True
 +
-+    def open_panel(self, doctor: Doctor, patient_id: str) -> PatientPanel:
-+        """Open or create a patient panel for a doctor/patient pair."""
++    def get_patient_data(self, patient_id: str) -> list[Data]:
++        """환자의 건강 데이터 목록을 반환한다.
 +
-+        return self.patient_panel_service.get_panel(doctor, patient_id)
++        환자를 찾지 못하면 빈 리스트를 반환한다.
++        """
 +
-+    def show_panel(self, patient_id: str) -> List[PatientPanelRow]:
-+        """Retrieve panel rows for presentation."""
-+
-+        return self.patient_panel_service.get_panel_rows(patient_id)
-+
-+    def save_care_plan(
-+        self,
-+        patient_id: str,
-+        comment: Optional[str],
-+        goal: Optional[CareGoal],
-+        given_evidence: bool,
-+    ) -> PatientPanel:
-+        """Save updates made through the UI into the underlying panel."""
-+
-+        return self.patient_panel_service.save_patient_panel(
-+            patient_id=patient_id,
-+            comment=comment,
-+            goal=goal,
-+            given_evidence=given_evidence,
-+        )
++        patient = self._find_patient(patient_id)
++        return patient.getDataList() if patient else []
 +
 +
-+class PatientPanelApp:
-+    """Tkinter-based GUI to demonstrate the patient panel workflow."""
++class IncentivizedPatient(Patient):
++    """인센티브 관련 보조 기능이 필요한 환자 클래스.
 +
-+    def __init__(self, root: tk.Tk) -> None:
-+        self.root = root
-+        self.root.title("Patient Panel Demo")
++    기본 :class:`user.Patient`에서 제공하는 속성을 확장만 하며, 새로운 사용자
++    계층을 만드는 대신 상속을 통해 기능을 덧붙인다.
++    """
 +
-+        self.service = PatientPanelService()
-+        self.frame = PatientPanelFrame(patient_panel_service=self.service)
++    def add_incentive(self, score: int) -> None:
++        self.__incentiveScore = getattr(self, "_Patient__incentiveScore", 0) + score
 +
-+        self.doctor = Doctor(doctor_id="dr-001", name="Kim")
-+        self.patient_id = "patient-001"
-+        self.patient = Patient(
-+            name="Park",
-+            picture="/tmp/patient.png",
-+            bmi=22.4,
-+            blood_pressure="120/80",
-+            blood_sugar="95",
-+            walking_avg=5000,
-+            sleeping_hour=7,
-+            last_accessed=datetime.utcnow(),
-+        )
-+
-+        self.goal = CareGoal(
-+            target_weight=70,
-+            target_bmi=21.5,
-+            start_date=datetime.utcnow(),
-+            target_bp="120/80",
-+            target_sugar="95",
-+            target_exercise=40,
-+            target_sleep=7.0,
-+        )
-+
-+        self.service.register_patient(self.patient_id, self.patient)
-+        self.frame.open_panel(doctor=self.doctor, patient_id=self.patient_id)
-+
-+        self._build_layout()
-+        self.refresh_panel_rows()
-+
-+    def _build_layout(self) -> None:
-+        info_frame = ttk.Frame(self.root, padding=10)
-+        info_frame.grid(row=0, column=0, sticky="ew")
-+        info_frame.columnconfigure(1, weight=1)
-+
-+        ttk.Label(info_frame, text=f"Doctor: {self.doctor.name}").grid(
-+            row=0, column=0, sticky="w"
-+        )
-+        ttk.Label(info_frame, text=f"Patient: {self.patient.name}").grid(
-+            row=1, column=0, sticky="w"
-+        )
-+
-+        form = ttk.Frame(self.root, padding=10)
-+        form.grid(row=1, column=0, sticky="ew")
-+        for idx in range(2):
-+            form.columnconfigure(idx + 1, weight=1)
-+
-+        ttk.Label(form, text="Blood Pressure").grid(row=0, column=0, sticky="w")
-+        self.bp_var = tk.StringVar(value="125/82")
-+        ttk.Entry(form, textvariable=self.bp_var).grid(row=0, column=1, sticky="ew")
-+
-+        ttk.Label(form, text="Blood Sugar").grid(row=1, column=0, sticky="w")
-+        self.bs_var = tk.StringVar(value="101")
-+        ttk.Entry(form, textvariable=self.bs_var).grid(row=1, column=1, sticky="ew")
-+
-+        ttk.Label(form, text="Exercise (min)").grid(row=2, column=0, sticky="w")
-+        self.exercise_var = tk.StringVar(value="35")
-+        ttk.Entry(form, textvariable=self.exercise_var).grid(
-+            row=2, column=1, sticky="ew"
-+        )
-+
-+        ttk.Label(form, text="Sleep Hours").grid(row=3, column=0, sticky="w")
-+        self.sleep_var = tk.StringVar(value="6.5")
-+        ttk.Entry(form, textvariable=self.sleep_var).grid(row=3, column=1, sticky="ew")
-+
-+        self.smoke_var = tk.BooleanVar(value=False)
-+        ttk.Checkbutton(form, text="Smoke", variable=self.smoke_var).grid(
-+            row=4, column=0, sticky="w"
-+        )
-+        self.alcohol_var = tk.BooleanVar(value=False)
-+        ttk.Checkbutton(form, text="Alcohol", variable=self.alcohol_var).grid(
-+            row=4, column=1, sticky="w"
-+        )
-+
-+        ttk.Label(form, text="Comment").grid(row=5, column=0, sticky="nw")
-+        self.comment_var = tk.StringVar(value="Encourage daily walks")
-+        ttk.Entry(form, textvariable=self.comment_var).grid(
-+            row=5, column=1, sticky="ew"
-+        )
-+
-+        self.evidence_var = tk.BooleanVar(value=True)
-+        ttk.Checkbutton(form, text="Given Evidence", variable=self.evidence_var).grid(
-+            row=6, column=0, sticky="w"
-+        )
-+
-+        ttk.Button(form, text="Add Panel Row", command=self.add_panel_row_from_form).grid(
-+            row=7, column=0, columnspan=2, pady=(10, 0), sticky="ew"
-+        )
-+
-+        list_frame = ttk.Frame(self.root, padding=10)
-+        list_frame.grid(row=2, column=0, sticky="nsew")
-+        self.root.rowconfigure(2, weight=1)
-+        list_frame.columnconfigure(0, weight=1)
-+        list_frame.rowconfigure(1, weight=1)
-+
-+        ttk.Label(list_frame, text="Panel Rows").grid(row=0, column=0, sticky="w")
-+        self.rows_list = tk.Listbox(list_frame, height=8)
-+        self.rows_list.grid(row=1, column=0, sticky="nsew")
-+
-+    def add_panel_row_from_form(self) -> None:
-+        snapshot = RiskSnapshot(
-+            blood_pressure=self.bp_var.get(),
-+            blood_sugar=self.bs_var.get(),
-+            exercise=int(float(self.exercise_var.get() or 0)),
-+            sleep_hour=float(self.sleep_var.get() or 0),
-+            smoke=bool(self.smoke_var.get()),
-+            alcohol=bool(self.alcohol_var.get()),
-+        )
-+
-+        warning = self.service.log_warning(
-+            patient_id=self.patient_id, reason="Updated snapshot", level="info"
-+        )
-+
-+        self.service.add_panel_row(
-+            doctor=self.doctor,
-+            patient_id=self.patient_id,
-+            risk_snapshot=snapshot,
-+            care_goal=self.goal,
-+            warning_flag_log=warning,
-+            incentive=None,
-+            comment=self.comment_var.get(),
-+            given_evidence=self.evidence_var.get(),
-+        )
-+
-+        self.frame.save_care_plan(
-+            patient_id=self.patient_id,
-+            comment=self.comment_var.get(),
-+            goal=self.goal,
-+            given_evidence=self.evidence_var.get(),
-+        )
-+
-+        self.refresh_panel_rows()
-+
-+    def refresh_panel_rows(self) -> None:
-+        self.rows_list.delete(0, tk.END)
-+        for row in self.frame.show_panel(patient_id=self.patient_id):
-+            summary = (
-+                f"{row.created_at.strftime('%H:%M:%S')} BP {row.risk_snapshot.blood_pressure} | "
-+                f"Goal BP {row.care_goal.target_bp if row.care_goal else 'N/A'} | "
-+                f"Warning {row.warning_flag_log.reason if row.warning_flag_log else 'None'}"
-+            )
-+            self.rows_list.insert(tk.END, summary)
-+
-+
-+def _demo_patient_panel_flow() -> None:
-+    """Run a small demonstration of the patient panel workflow."""
-+
-+    doctor = Doctor(doctor_id="dr-001", name="Kim")
-+    patient = Patient(
-+        name="Park",
-+        picture="/tmp/patient.png",
-+        bmi=22.4,
-+        blood_pressure="120/80",
-+        blood_sugar="95",
-+        walking_avg=5000,
-+        sleeping_hour=7,
-+        last_accessed=datetime.utcnow(),
-+    )
-+
-+    service = PatientPanelService()
-+    frame = PatientPanelFrame(patient_panel_service=service)
-+
-+    patient_id = "patient-001"
-+    service.register_patient(patient_id=patient_id, patient=patient)
-+
-+    print("Opening panel for doctor/patient pair…")
-+    panel = frame.open_panel(doctor=doctor, patient_id=patient_id)
-+    print(f"Panel opened for patient: {panel.patient.name}\n")
-+
-+    snapshot = RiskSnapshot(
-+        blood_pressure="125/82",
-+        blood_sugar="101",
-+        exercise=35,
-+        sleep_hour=6.5,
-+        smoke=False,
-+        alcohol=False,
-+    )
-+    goal = CareGoal(
-+        target_weight=70,
-+        target_bmi=21.5,
-+        start_date=datetime.utcnow(),
-+        target_bp="120/80",
-+        target_sugar="95",
-+        target_exercise=40,
-+        target_sleep=7.0,
-+    )
-+    warning = service.log_warning(patient_id=patient_id, reason="Slightly high BP", level="low")
-+
-+    print("Adding a panel row with the first snapshot…")
-+    panel_row = service.add_panel_row(
-+        doctor=doctor,
-+        patient_id=patient_id,
-+        risk_snapshot=snapshot,
-+        care_goal=goal,
-+        warning_flag_log=warning,
-+        incentive=None,
-+        comment="Encourage daily walks",
-+        given_evidence=True,
-+    )
-+    print(f"Panel row stored at {panel_row.created_at.isoformat()}\n")
-+
-+    print("Saving care plan updates back to the panel…")
-+    frame.save_care_plan(
-+        patient_id=patient_id,
-+        comment="Follow-up scheduled next month",
-+        goal=goal,
-+        given_evidence=panel.given_evidence,
-+    )
-+
-+    print("Final panel rows:")
-+    for row in frame.show_panel(patient_id=patient_id):
-+        print(
-+            f"- Snapshot BP {row.risk_snapshot.blood_pressure}, "
-+            f"Goal BP {row.care_goal.target_bp if row.care_goal else 'N/A'}, "
-+            f"Warnings {row.warning_flag_log.reason if row.warning_flag_log else 'None'}"
-+        )
-+
-+
-+def _run_gui() -> None:
-+    root = tk.Tk()
-+    PatientPanelApp(root)
-+    root.mainloop()
-+
-+
-+def _main() -> None:
-+    parser = argparse.ArgumentParser(description="Patient panel demo")
-+    parser.add_argument(
-+        "--cli-demo",
-+        action="store_true",
-+        help="Run the console demonstration instead of the Tkinter UI",
-+    )
-+    args = parser.parse_args()
-+
-+    if args.cli_demo:
-+        _demo_patient_panel_flow()
-+    else:
-+        _run_gui()
-+
-+
-+if __name__ == "__main__":
-+    _main()
++    def get_incentive(self) -> int:
++        return getattr(self, "_Patient__incentiveScore", 0)

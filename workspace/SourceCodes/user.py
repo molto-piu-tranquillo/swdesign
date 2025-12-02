@@ -128,19 +128,22 @@ class Patient(User): # 일반 사용자(환자) 클래스
         self.__dataList: list[Data] = [] # 건강 데이터 리스트 (시계열 기록)
 
         self.__mainDocter: User = None # 주치의
-        self.__friendList: list = [] # 친구 목록
+        self.__friendIdList: list[str] = [] # 친구 목록
 
         self.__incentiveScore = 0 # 인센티브 점수
         self.__badgeCount = 0 # 뱃지 개수
 
+        self.__contents: list[str] = [] # 콘텐츠 목록(추가됨)
+        self.__changeRequests: list[str] = [] # 변경사항 목록(추가됨)
+
     def getDataList(self) -> list[Data]: # 시계열 기록의 데이터 리스트를 가져오는 메소드
         return self.__dataList
 
-    def setFriendList(self, friendList: list) -> None:
-        self.__friendList = friendList
+    def setFriendIdList(self, friendIdList: list[str]) -> None:
+        self.__friendIdList = friendIdList
 
-    def getFriendList(self) -> list:
-        return self.__friendList
+    def getFriendIdList(self) -> list[str]:
+        return self.__friendIdList
 
     def setBadgeCount(self, badgeCount: int) -> None:
         self.__badgeCount = badgeCount
@@ -151,8 +154,40 @@ class Patient(User): # 일반 사용자(환자) 클래스
     def addData(self, data: Data) -> None: # 시계열 기록의 데이터를 추가하는 메소드
         self.__dataList.append(data)
 
-    def addFriend(self, friend):
-        self.__friendList.append(friend)
+    def isFriendExist(self, friendId: str) -> bool: # 아이디 기준으로 친구 목록 검색
+        for i in range(len(self.__friendList)):
+            if self.__friendList[i].getid() == friendId:
+                return True
+        return False
+
+    def addFriend(self, friendId):
+        self.__friendIdList.append(friendId)
+
+    def setIncentiveScore(self, incentiveScore: int) -> None:
+        self.__incentiveScore = incentiveScore
+
+    def getIncentiveScore(self) -> int:
+        return self.__incentiveScore
+    
+     # 콘텐츠 조회 메소드(추가됨)
+    def get_contents(self) -> list[str]:
+        return self.__contents
+    
+    # 콘텐츠 추가 메소드(추가됨)
+    def add_content(self, text: str):
+        self.__contents.append(text)
+    
+    # 변경 요청 추가 메소드 (추가됨)
+    def add_change_request(self, text: str):
+        self.__changeRequests.append(text)
+    
+    # 변경 요청 조회 메소드 (추가됨)
+    def get_change_requests(self) -> list[str]:
+        return self.__changeRequests
+    
+    # 리스트를 빈 리스트로 초기화(추가됨)
+    def clear_change_requests(self):
+        self.__changeRequests = []
 
 class Docter(User): # 주치의 클래스
     def __init__(self, name: str, age: int, gender: str, id: str, pw: str,\

@@ -10,6 +10,8 @@ frame.geometry('800x800')
 loginFrame = LoginFrame(frame)
 loginFrame.pack()
 
+# dummy_user = Patient {"Kim", 35, "남", "123", "pw", "010-0000-0000", "test@mail.com", "개인 사용자"}
+
 """
 userlist = []
 userlistFile = open('..//Datas//userlist.bin', mode = 'wb')

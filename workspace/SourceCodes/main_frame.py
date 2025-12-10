@@ -154,6 +154,27 @@ class MainFrame(Frame, User):
         self.changePasswordFrame = ChangePasswordFrame(self, self.user)
         self.changePasswordFrame.place(x = 0, y = 0)
 
+    # <추가됨> 커서 올릴때 반응 추가    
+    def apply_hover_effect(self, button):
+        # 호버 시 색상
+        hover_color = '#09FFFA' 
+        # 기본 색상
+        default_color = 'white'
+
+        def on_enter(e):
+            # 버튼이 활성화(NORMAL) 상태일 때만 색 변경
+            if button['state'] != DISABLED:
+                button['bg'] = hover_color
+
+        def on_leave(e):
+            # 버튼이 활성화(NORMAL) 상태일 때만 원래 색으로 복구
+            if button['state'] != DISABLED:
+                button['bg'] = default_color
+
+        # 이벤트 바인딩
+        button.bind("<Enter>", on_enter) # 마우스 들어옴
+        button.bind("<Leave>", on_leave)
+
     def __init__(self, window: Frame, user: User) -> None:
         super().__init__(window, bg = "#09FFFA", width = 800, height = 800)
 
@@ -253,6 +274,10 @@ class MainFrame(Frame, User):
         self.F5D_Button.place(x = 580, y = 280)
 
         self._config_button()
+        
+        for widget in window.winfo_children(): #추가됨
+            if isinstance(widget, Button):
+                self.apply_hover_effect(widget)
 
     def _config_button(self):
         user_type = self.user.getUserType()
@@ -321,5 +346,6 @@ if DEBUG_FOR_PASSWORD_FRAME:
 
     frame = ChangePasswordFrame(window, doctor)
     frame.place(x = 0, y = 0)
+
 
     window.mainloop()

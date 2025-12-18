@@ -16,5 +16,3 @@ env/
 
 # Project specific
 *.patch
-Datas/userlist.bin
-Images/health_data_graph.png

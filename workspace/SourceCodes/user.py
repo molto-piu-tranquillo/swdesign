@@ -169,6 +169,14 @@ class Patient(User): # 일반 사용자(환자) 클래스
 
         self.__goal: str = '' # 목표
 
+        self.__nextVisitDate: list[int] = [0, 0, 0] # 다음 진료일 [년, 월, 일]
+
+    def setNextVisitDate(self, year: int, month: int, day: int) -> None:
+        self.__nextVisitDate = [year, month, day]
+
+    def getNextVisitDate(self) -> list[int]:
+        return self.__nextVisitDate
+
     def setConnectedParentId(self, parentId: str) -> None:
         self.__connectedParentId = parentId
 

@@ -60,6 +60,10 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
                 borderwidth = 1, command = lambda: self.setIncentiveToPatient())
         self.setIncentiveButton.place(x = 515, y = 5)
 
+        self.setNextVisitButton = Button(self, text = '다음\n진료일', font = ('Arial', 12, 'bold'), bg = '#D6F5FF',\
+                borderwidth = 1, command = lambda: self.showSetNextVisitDialog())
+        self.setNextVisitButton.place(x = 445, y = 5)
+
         self.analysisDanger()
 
     def setIncentiveToPatient(self): # 인센티브 부여 메소드
@@ -108,6 +112,55 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
         userlistFile.close()
 
         messagebox.showinfo('알림', '인센티브 부여가 완료되었습니다.')
+
+    def showSetNextVisitDialog(self): # 다음 진료일 설정 다이얼로그
+        dialog = Toplevel(self)
+        dialog.title('다음 진료일 설정')
+        dialog.geometry('300x150')
+
+        Label(dialog, text = '다음 진료일 (년/월/일)', font = ('Arial', 12, 'bold')).pack(pady = 10)
+
+        entryFrame = Frame(dialog)
+        entryFrame.pack()
+
+        yearEntry = Entry(entryFrame, width = 6, font = ('Arial', 12))
+        monthEntry = Entry(entryFrame, width = 4, font = ('Arial', 12))
+        dayEntry = Entry(entryFrame, width = 4, font = ('Arial', 12))
+
+        yearEntry.pack(side = LEFT, padx = 2)
+        Label(entryFrame, text = '/', font = ('Arial', 12)).pack(side = LEFT)
+        monthEntry.pack(side = LEFT, padx = 2)
+        Label(entryFrame, text = '/', font = ('Arial', 12)).pack(side = LEFT)
+        dayEntry.pack(side = LEFT, padx = 2)
+
+        def saveNextVisit():
+            try:
+                year = int(yearEntry.get())
+                month = int(monthEntry.get())
+                day = int(dayEntry.get())
+            except:
+                messagebox.showerror('오류', '올바른 날짜를 입력하세요.')
+                return
+
+            self.__patient.setNextVisitDate(year, month, day)
+
+            userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+            userlist: list[User] = pk.load(file = userlistFile)
+            userlistFile.close()
+
+            for i in range(len(userlist)):
+                if userlist[i].getId() == self.__patient.getId():
+                    userlist[i] = self.__patient
+                    break
+
+            userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+            pk.dump(file = userlistFile, obj = userlist)
+            userlistFile.close()
+
+            messagebox.showinfo('알림', '다음 진료일이 설정되었습니다.\n{}/{}/{}'.format(year, month, day))
+            dialog.destroy()
+
+        Button(dialog, text = '저장', font = ('Arial', 11, 'bold'), bg = '#D6F5FF', command = saveNextVisit).pack(pady = 15)
 
     def analysisDanger(self): # 위험도 산출 메소드
         if len(self.__patient.getDataList()) == 0:

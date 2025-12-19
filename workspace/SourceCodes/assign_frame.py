@@ -159,7 +159,9 @@ class AssignFrame(Frame):
         self.pwEntry = Entry(self, width = 25, font = ('Arial', 15, 'bold'))
         self.phoneNumberEntry = Entry(self, width = 25, font = ('Arial', 15, 'bold'))
         self.emailEntry = Entry(self, width = 25, font = ('Arial', 15, 'bold'))
-        self.userTypeEntry = Entry(self, width = 25, font = ('Arial', 15, 'bold'))
+        self.userTypeEntry = ttk.Combobox(self, width = 23, font = ('Arial', 15, 'bold'), state = "readonly")
+        self.userTypeEntry['values'] = ('개인 사용자', '보호자', '의사')
+        self.userTypeEntry.current(0)
 
         self.nameLabel.place(x = 200, y = 230); self.nameEntry.place(x = 275, y = 230)
         self.ageLabel.place(x = 200, y = 280); self.ageEntry.place(x = 275, y = 280)

@@ -69,6 +69,8 @@ class CheckDangerFrame(Frame):
 
         # => 전체 위험도 계산
         totalDanger += (bloodPressureDanger + bloodSugarDanger + smokeDanger + alchoholDanger + eatDanger + exerciseDanger)
+        self.__patient.setIncentiveScore(totalDanger)#수정됨
+        self.__patient.addNotification('점수가 부여되었습니다.')
 
         if totalDanger >= 4:
             messagebox.showinfo('알림', '건강 위험도가 높습니다!\n')

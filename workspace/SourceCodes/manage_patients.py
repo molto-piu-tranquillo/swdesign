@@ -96,7 +96,7 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
         if currData.getExerciseKcal() >= prevData.getExerciseKcal() * 1.15:
             incentiveScore += 1
 
-        self.__patient.setIncentiveScore(incentiveScore)
+        self.__patient.addIncentiveScore(incentiveScore)
         self.__patient.addNotification('인센티브가 부여되었습니다.')
 
         userlistFile = open(USERLIST_PATH, mode = 'rb')

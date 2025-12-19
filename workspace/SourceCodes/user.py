@@ -244,6 +244,9 @@ class Patient(User): # 일반 사용자(환자) 클래스
     def setIncentiveScore(self, incentiveScore: int) -> None:
         self.__incentiveScore = incentiveScore
 
+    def addIncentiveScore(self, incentiveScore: int) -> None: #추가됨
+        self.__incentiveScore += incentiveScore
+
     def getIncentiveScore(self) -> int:
         return self.__incentiveScore
 
@@ -322,4 +325,5 @@ class Parent(User): # 보호자 클래스
                 break
 
     def addPatientById(self, addedId: str): # 특정 환자 아이디 추가
+
         self.__patientIdList.append(addedId)

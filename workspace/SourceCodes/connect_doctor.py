@@ -5,6 +5,7 @@ from tkinter import messagebox
 from user import User, Patient, Doctor, Data
 import pickle as pk
 import random as rd
+from data_paths import USERLIST_PATH
 
 class ConnectPatientFromDoctorFrame(Frame): # 의사 입장에서 관리 환자 연결
     def __init__(self, window: Frame, doctor: Doctor):
@@ -46,7 +47,7 @@ class ConnectPatientFromDoctorFrame(Frame): # 의사 입장에서 관리 환자 
                 messagebox.showinfo('알림', '이미 연결된 환자입니다.')
                 return
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 
@@ -59,7 +60,7 @@ class ConnectPatientFromDoctorFrame(Frame): # 의사 입장에서 관리 환자 
                 userlist[i].setMainDoctorId(self.__doctor.getId())
                 break
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 
@@ -92,7 +93,7 @@ class ConnectDoctorFromPatientFrame(Frame): # 환자 입장에서 주치의 연�
         self.doctorIdLabel.place(x = 100, y = 175); self.doctorIdEntry.place(x = 200, y = 175); self.findDoctorByIdButton.place(x = 630, y = 175)
 
     def findDoctorById(self): # ID 기준으로 의사를 찾는 메소드
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 
@@ -161,7 +162,7 @@ class ConnectDoctorFromPatientFrame(Frame): # 환자 입장에서 주치의 연�
             randCharList.append(chr(rd.randint(ord('0'), ord('9'))))
             inviteCode += randCharList[rd.randint(0, len(randCharList) - 1)]
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 
@@ -174,7 +175,7 @@ class ConnectDoctorFromPatientFrame(Frame): # 환자 입장에서 주치의 연�
                 userlist[i].setInviteCodeList(patientId, inviteCode)
                 break
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 
@@ -188,7 +189,7 @@ class ConnectDoctorFromPatientFrame(Frame): # 환자 입장에서 주치의 연�
             deletedDoctorId: str = self.__patient.getMainDoctorId()
             self.__patient.setMainDoctorId('')
 
-            userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+            userlistFile = open(USERLIST_PATH, mode = 'rb')
             userlist: list[User] = pk.load(file = userlistFile)
             userlistFile.close()
 
@@ -201,7 +202,7 @@ class ConnectDoctorFromPatientFrame(Frame): # 환자 입장에서 주치의 연�
                     userlist[i].deletePatientById(self.__patient.getId())
                     break
 
-            userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+            userlistFile = open(USERLIST_PATH, mode = 'wb')
             pk.dump(file = userlistFile, obj = userlist)
             userlistFile.close()
 

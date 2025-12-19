@@ -7,6 +7,7 @@ from tkinter import messagebox
 from user import User, Patient, Parent, Data
 import pickle as pk
 import random as rd
+from data_paths import USERLIST_PATH
 
 class ConnectParentFromPatientFrame(Frame): # 환자 입장에서 보호자 연결
     def __init__(self, window: Frame, patient: Patient):
@@ -31,7 +32,7 @@ class ConnectParentFromPatientFrame(Frame): # 환자 입장에서 보호자 연�
         self.parentIdLabel.place(x = 100, y = 175); self.parentIdEntry.place(x = 200, y = 175); self.findParentByIdButton.place(x = 630, y = 175)
 
     def findParentById(self): # ID 기준으로 보호자를 찾는 메소드
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 
@@ -98,7 +99,7 @@ class ConnectParentFromPatientFrame(Frame): # 환자 입장에서 보호자 연�
             randCharList.append(chr(rd.randint(ord('0'), ord('9'))))
             inviteCode += randCharList[rd.randint(0, len(randCharList) - 1)]
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 
@@ -111,7 +112,7 @@ class ConnectParentFromPatientFrame(Frame): # 환자 입장에서 보호자 연�
                 userlist[i].setInviteCodeList(patientId, inviteCode)
                 break
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 
@@ -125,7 +126,7 @@ class ConnectParentFromPatientFrame(Frame): # 환자 입장에서 보호자 연�
             deletedParentId: str = self.__patient.getConnectedParentId()
             self.__patient.setConnectedParentId('')
 
-            userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+            userlistFile = open(USERLIST_PATH, mode = 'rb')
             userlist: list[User] = pk.load(file = userlistFile)
             userlistFile.close()
 
@@ -138,7 +139,7 @@ class ConnectParentFromPatientFrame(Frame): # 환자 입장에서 보호자 연�
                     userlist[i].deletePatientById(self.__patient.getId())
                     break
 
-            userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+            userlistFile = open(USERLIST_PATH, mode = 'wb')
             pk.dump(file = userlistFile, obj = userlist)
             userlistFile.close()
 
@@ -187,7 +188,7 @@ class ConnectPatientFromParentFrame(Frame): # 보호자 입장에서 환자 연�
                 messagebox.showinfo('알림', '이미 연결된 환자입니다.')
                 return
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 
@@ -200,7 +201,7 @@ class ConnectPatientFromParentFrame(Frame): # 보호자 입장에서 환자 연�
                 userlist[i].setConnectedParentId(self.__parent.getId())
                 break
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 

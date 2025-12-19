@@ -6,6 +6,7 @@ from tkinter import *
 from tkinter import messagebox
 import pickle as pk
 from user import *
+from data_paths import USERLIST_PATH
 
 class CheckDangerFrame(Frame):
     def __init__(self, window: Frame, patient: Patient):
@@ -73,7 +74,7 @@ class CheckDangerFrame(Frame):
             messagebox.showinfo('알림', '건강 위험도가 높습니다!\n')
 
             # 건강 위험도가 높을 경우, 환자 및 보호자에게 알림을 보냄.
-            userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+            userlistFile = open(USERLIST_PATH, mode = 'rb')
             userlist: list[User] = pk.load(file = userlistFile)
             userlistFile.close()
 
@@ -84,7 +85,7 @@ class CheckDangerFrame(Frame):
                             .format(self.__patient.getName(), self.__patient.getId()))
                     break
 
-            userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+            userlistFile = open(USERLIST_PATH, mode = 'wb')
             pk.dump(file = userlistFile, obj = userlist)
             userlistFile.close()
 

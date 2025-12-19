@@ -9,6 +9,7 @@ from user import *
 
 import matplotlib.pyplot as plt
 import os
+from data_paths import USERLIST_PATH
 
 
 class ReportFrame(Frame):
@@ -95,7 +96,7 @@ class ReportFrame(Frame):
     def saveGoal(self):
         self.__patient.setGoal(self.goalText.get('1.0', END))
 
-        with open('../Datas/userlist.bin', 'rb') as f:
+        with open(USERLIST_PATH, 'rb') as f:
             userlist: list[User] = pk.load(f)
 
         for i in range(len(userlist)):
@@ -103,7 +104,7 @@ class ReportFrame(Frame):
                 userlist[i] = self.__patient
                 break
 
-        with open('../Datas/userlist.bin', 'wb') as f:
+        with open(USERLIST_PATH, 'wb') as f:
             pk.dump(userlist, f)
 
         messagebox.showinfo('알림', '목표가 저장되었습니다.')

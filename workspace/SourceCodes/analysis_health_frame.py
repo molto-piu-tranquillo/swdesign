@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter import messagebox
 from user import User, Patient, Data
 import pickle as pk
+from data_paths import USERLIST_PATH
 
 class AnalysisFrame(Frame):
     def __init__(self, window: Frame, patient: Patient):
@@ -259,7 +260,7 @@ class AnalysisFrame(Frame):
         self.__patient.addData(savedData)
 
         # 데이터가 입력되면 userlist.bin 파일을 변경해야 함.
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(userlistFile)
         userlistFile.close()
 
@@ -268,7 +269,7 @@ class AnalysisFrame(Frame):
                 userlist[i] = self.__patient
                 break
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(userlist, file = userlistFile)
         userlistFile.close()
 

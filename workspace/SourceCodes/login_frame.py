@@ -4,9 +4,11 @@ from tkinter import *
 from tkinter import messagebox
 import tkinter.font as tkFont
 import pickle as pk
+
 from assign_frame import AssignFrame
 from main_frame import MainFrame
 from user import User
+from data_paths import USERLIST_PATH
 # from user import User
 # import my_algorithm
 
@@ -69,7 +71,7 @@ class LoginFrame(Frame):
             messagebox.showerror('오류', '비밀번호가 입력되지 않았습니다.')
             return
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 

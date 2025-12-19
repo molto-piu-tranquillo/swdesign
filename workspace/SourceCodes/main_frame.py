@@ -26,6 +26,7 @@ from manage_patients import PatientPanelFrame # [추가]
 from recommend_menu import RecommendMenuFrame # [추가]
 from direct_message import DirectMessageFrame # [추가]
 from check_badge_count import CheckBadgeCountFrame # [추가]
+from data_paths import USERLIST_PATH
 
 class ChangePasswordFrame(Frame): # 비밀번호 변경 프레임
     def __init__(self, window: Frame, user: User):
@@ -82,7 +83,7 @@ class ChangePasswordFrame(Frame): # 비밀번호 변경 프레임
             messagebox.showerror('오류', '다시 입력된 새 비밀번호가 일치하지 않습니다.')
             return
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 
@@ -91,7 +92,7 @@ class ChangePasswordFrame(Frame): # 비밀번호 변경 프레임
                 userlist[i].setPw(self.changedPasswordEntry.get())
                 break
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 
@@ -353,7 +354,7 @@ class MainFrame(Frame, User):
         if diff == 1: # 내일이 진료일
             self.user.addNotification('내일 진료 예정일입니다. ({}/{}/{})'.format(nextVisit[0], nextVisit[1], nextVisit[2]))
 
-            userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+            userlistFile = open(USERLIST_PATH, mode = 'rb')
             userlist: list[User] = pk.load(file = userlistFile)
             userlistFile.close()
 
@@ -362,7 +363,7 @@ class MainFrame(Frame, User):
                     userlist[i] = self.user
                     break
 
-            userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+            userlistFile = open(USERLIST_PATH, mode = 'wb')
             pk.dump(file = userlistFile, obj = userlist)
             userlistFile.close()
 

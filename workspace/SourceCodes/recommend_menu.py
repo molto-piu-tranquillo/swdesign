@@ -7,6 +7,7 @@ from user import *
 import pickle as pk
 
 import random as rd
+from data_paths import USERLIST_PATH
 
 class RecommendSystem: # 식단 추천 시스템
     def __init__(self, data: Data):
@@ -211,7 +212,7 @@ if DEBUG:
     userlist: list[User] = []
     userlist.append(patient)
 
-    userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+    userlistFile = open(USERLIST_PATH, mode = 'wb')
     pk.dump(file = userlistFile, obj = userlist)
     userlistFile.close()
 

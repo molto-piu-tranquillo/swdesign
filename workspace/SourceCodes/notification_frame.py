@@ -6,6 +6,7 @@ from tkinter import *
 from tkinter import messagebox
 from user import *
 import pickle as pk
+from data_paths import USERLIST_PATH
 
 class NotificationFrame(Frame):
     def __init__(self, window: Frame, user: User):
@@ -50,7 +51,7 @@ class NotificationFrame(Frame):
     def deleteNotification(self, notification: str): # 알림 목록 하나를 없애는 메소드
         self.__user.deleteNotification(notification)
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 
@@ -59,7 +60,7 @@ class NotificationFrame(Frame):
                 userlist[i] = self.__user
                 break
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 

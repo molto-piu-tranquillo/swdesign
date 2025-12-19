@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import pickle as pk
 import os
+from data_paths import USERLIST_PATH
 
 class AddRequest(Frame):
     def save_request(self):
@@ -12,7 +13,7 @@ class AddRequest(Frame):
             return
 
         # 경로 설정
-        file_path = '..//Datas//userlist.bin'
+        file_path = USERLIST_PATH
 
         try:
             with open(file_path, 'rb') as f:

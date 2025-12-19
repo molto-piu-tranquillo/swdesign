@@ -5,10 +5,11 @@ from tkinter import messagebox
 import pickle as pk
 
 from user import *
+from data_paths import USERLIST_PATH
 
 class AssignFrame(Frame):
     def assignUser(self) -> None:
-        userlistFile = open(file = '..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(file = USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(userlistFile)
         userlistFile.close()
 
@@ -124,7 +125,7 @@ class AssignFrame(Frame):
             messagebox.showerror('오류', '개인 사용자, 보호자, 의사 중 입력하세요.')
             return
 
-        userlistFile = open(file = '..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(file = USERLIST_PATH, mode = 'wb')
         pk.dump(userlist, file = userlistFile)
         userlistFile.close()
 

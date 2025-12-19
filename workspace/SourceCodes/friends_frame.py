@@ -68,7 +68,7 @@ class CompetitionFrame(Frame):
         # 그룹 사용자를 화면에 보여주고, 뱃지가 있으면 함께 표시하기
         for i in range(len(groupUserList)):
             groupUserFrame = Frame(self, width = 600, height = 50, bg = 'white')
-            groupUserLabel = Label(groupUserFrame, text = '@{:25s} 이름: {:15s} | 인센티브: {:4d}점'\
+            groupUserLabel = Label(groupUserFrame, text = '@{:25s} 이름: {:15s} | 점수: {:4d}점'\
                     .format(groupUserList[i].getId(), groupUserList[i].getName(), groupUserList[i].getIncentiveScore()),\
                     font = ('Arial', 12, 'bold'), bg = 'white')
             if groupUserList[i].getBadgeCount() == 1:

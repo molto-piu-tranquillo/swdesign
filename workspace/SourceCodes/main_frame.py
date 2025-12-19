@@ -5,6 +5,7 @@ from tkinter import *
 from tkinter import messagebox
 import tkinter.font as tkFont
 import pickle as pk
+import datetime as dt
 
 from user import *
 
@@ -334,6 +335,36 @@ class MainFrame(Frame, User):
         for widget in window.winfo_children(): #추가됨
             if isinstance(widget, Button):
                 self.apply_hover_effect(widget)
+
+        self.checkVisitReminder()
+
+    def checkVisitReminder(self): # 진료일 전날 리마인더 체크
+        if self.user.getUserType() != '개인 사용자':
+            return
+
+        nextVisit = self.user.getNextVisitDate()
+        if nextVisit[0] == 0: # 진료일 미설정
+            return
+
+        today = dt.date.today()
+        visitDate = dt.date(nextVisit[0], nextVisit[1], nextVisit[2])
+        diff = (visitDate - today).days
+
+        if diff == 1: # 내일이 진료일
+            self.user.addNotification('내일 진료 예정일입니다. ({}/{}/{})'.format(nextVisit[0], nextVisit[1], nextVisit[2]))
+
+            userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+            userlist: list[User] = pk.load(file = userlistFile)
+            userlistFile.close()
+
+            for i in range(len(userlist)):
+                if userlist[i].getId() == self.user.getId():
+                    userlist[i] = self.user
+                    break
+
+            userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+            pk.dump(file = userlistFile, obj = userlist)
+            userlistFile.close()
 
     def _config_button(self):
         user_type = self.user.getUserType()

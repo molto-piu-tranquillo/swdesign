@@ -4,6 +4,7 @@ from tkinter import *
 import tkinter.messagebox
 from user import Patient, Data, User
 import pickle as pk
+from data_paths import USERLIST_PATH
 
 class CompetitionSys:
     def __init__(self, groupUserList: list[Patient]):
@@ -49,7 +50,7 @@ class CompetitionFrame(Frame):
 
         self.runCompetition()
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(userlistFile)
         userlistFile.close()
         
@@ -80,7 +81,7 @@ class CompetitionFrame(Frame):
             self.groupUserPanelList[i].place(x = 100, y = 150 + 60 * i)
 
     def runCompetition(self): # 경쟁 시스템 작동
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(userlistFile)
         userlistFile.close()
 
@@ -102,7 +103,7 @@ class CompetitionFrame(Frame):
                     userlist[j] = groupUserList[i]
                     break
 
-        userlistFile = open('..//Datas/userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 
@@ -134,7 +135,7 @@ class FriendsFrame(Frame):
             self.foundUserPanel.place_forget()
             self.foundUserPanel = None
 
-        userlistFile = open('..//Datas/userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(userlistFile)
         userlistFile.close()
 
@@ -171,7 +172,7 @@ class FriendsFrame(Frame):
                     self.foundUsersLabel.place(x = 250, y = 400)
 
     def addFriend(self): # 친구 추가
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(userlistFile)
         userlistFile.close()
 
@@ -205,14 +206,14 @@ class FriendsFrame(Frame):
                 userlist[i] = addedFriend
                 break
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 
         tkinter.messagebox.showinfo('알림', '친구 추가가 완료되었습니다.')
 
     def deleteFriend(self): # 친구 삭제
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(userlistFile)
         userlistFile.close()
 
@@ -252,7 +253,7 @@ class FriendsFrame(Frame):
                 userlist[i] = deletedFriend
                 break
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 
@@ -323,7 +324,7 @@ class FriendsFrame(Frame):
             friendIdList: list[Patient] = self.__patient.getFriendIdList()
             friendList: list[Patient] = []
 
-            userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+            userlistFile = open(USERLIST_PATH, mode = 'rb')
             userlist: list[User] = pk.load(userlistFile)
             userlistFile.close()
 
@@ -375,7 +376,7 @@ if DEBUG:
     userlist.append(friend1)
     userlist.append(friend2)
 
-    userlistFile = open('..//Datas/userlist.bin', mode = 'wb')
+    userlistFile = open(USERLIST_PATH, mode = 'wb')
     pk.dump(file = userlistFile, obj = userlist)
     userlistFile.close()
 

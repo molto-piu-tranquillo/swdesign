@@ -3,6 +3,7 @@ DEBUG_FOR_ADDING_DATA = True
 
 import pickle as pk
 from user import *
+from data_paths import USERLIST_PATH
 
 userlist: list[User] = []
 
@@ -25,7 +26,7 @@ userlist.append(patient)
 userlist.append(parent)
 userlist.append(doctor)
 
-userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+userlistFile = open(USERLIST_PATH, mode = 'wb')
 pk.dump(file = userlistFile, obj = userlist)
 userlistFile.close()
 

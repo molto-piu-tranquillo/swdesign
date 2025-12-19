@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import pickle as pk
 from user import User, Patient
+from data_paths import USERLIST_PATH
 
 class AddContent(Frame):
     def save_content(self):
@@ -17,7 +18,7 @@ class AddContent(Frame):
 
         # 데이터 파일 로드 및 업데이트
         try:
-            with open('..//Datas//userlist.bin', 'rb') as f:
+            with open(USERLIST_PATH, 'rb') as f:
                 userlist = pk.load(f)
 
             target_user = None
@@ -36,7 +37,7 @@ class AddContent(Frame):
                     userlist[target_index] = target_user # 리스트 업데이트
 
                     # 파일 저장
-                    with open('..//Datas//userlist.bin', 'wb') as f:
+                    with open(USERLIST_PATH, 'wb') as f:
                         pk.dump(userlist, f)
                     
                     messagebox.showinfo("성공", f"{target_id}님에게 콘텐츠를 추가했습니다.")

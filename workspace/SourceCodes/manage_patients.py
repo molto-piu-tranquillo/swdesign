@@ -8,6 +8,7 @@ import pickle as pk
 import matplotlib.pyplot as plt
 
 from user import *
+from data_paths import USERLIST_PATH
 
 class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
     GENERAL_INFO = 0
@@ -98,7 +99,7 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
         self.__patient.setIncentiveScore(incentiveScore)
         self.__patient.addNotification('인센티브가 부여되었습니다.')
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 
@@ -107,7 +108,7 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
                 userlist[i] = self.__patient
                 break
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 
@@ -144,7 +145,7 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
 
             self.__patient.setNextVisitDate(year, month, day)
 
-            userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+            userlistFile = open(USERLIST_PATH, mode = 'rb')
             userlist: list[User] = pk.load(file = userlistFile)
             userlistFile.close()
 
@@ -153,7 +154,7 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
                     userlist[i] = self.__patient
                     break
 
-            userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+            userlistFile = open(USERLIST_PATH, mode = 'wb')
             pk.dump(file = userlistFile, obj = userlist)
             userlistFile.close()
 
@@ -382,7 +383,7 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
         self.__patient.setGoal(self.__patient.getGoal() + '\n[Comment]\n' + self.commentText.get('1.0', END))
         self.__patient.addNotification('목표 설정에 대한 주치의의 의견이 추가되었습니다.')
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 
@@ -391,7 +392,7 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
                 userlist[i] = self.__patient
                 break
         
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 
@@ -588,7 +589,7 @@ class PatientPanelFrame(Frame):
         else:
             patientList: list[Patient] = [] # 주치의가 담당하는 환자 리스트
             
-            userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+            userlistFile = open(USERLIST_PATH, mode = 'rb')
             userlist: list[User] = pk.load(file = userlistFile)
             userlistFile.close()
 
@@ -657,7 +658,7 @@ if DEBUG:
     userlist.append(patient2)
     userlist.append(doctor)
 
-    userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+    userlistFile = open(USERLIST_PATH, mode = 'wb')
     pk.dump(file = userlistFile, obj = userlist)
     userlistFile.close()
 

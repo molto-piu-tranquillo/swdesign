@@ -8,6 +8,7 @@ from user import *
 import pickle as pk
 
 import datetime as dt
+from data_paths import USERLIST_PATH
 
 class DirectMessageFrame(Frame):
     def __init__(self, window: Frame, user: User):
@@ -38,7 +39,7 @@ class DirectMessageFrame(Frame):
             messagebox.showerror('오류', 'ID가 입력되지 않았습니다.')
             return
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'rb')
+        userlistFile = open(USERLIST_PATH, mode = 'rb')
         userlist: list[User] = pk.load(file = userlistFile)
         userlistFile.close()
 
@@ -77,7 +78,7 @@ class DirectMessageFrame(Frame):
                     userlist[i] = receivedUser
                     break
 
-        userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+        userlistFile = open(USERLIST_PATH, mode = 'wb')
         pk.dump(file = userlistFile, obj = userlist)
         userlistFile.close()
 
@@ -110,7 +111,7 @@ if DEBUG:
     userlist: list[User] = []
     userlist.append(patient)
 
-    userlistFile = open('..//Datas//userlist.bin', mode = 'wb')
+    userlistFile = open(USERLIST_PATH, mode = 'wb')
     pk.dump(file = userlistFile, obj = userlist)
     userlistFile.close()
 

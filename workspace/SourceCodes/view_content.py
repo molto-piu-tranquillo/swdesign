@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import pickle as pk
 from user import User
+from data_paths import USERLIST_PATH
 
 class ViewContent(Frame):
     def __init__(self, window: Frame, user_id):
@@ -23,7 +24,7 @@ class ViewContent(Frame):
 
     def load_contents(self):
         try:
-            with open('..//Datas//userlist.bin', 'rb') as f:
+            with open(USERLIST_PATH, 'rb') as f:
                 userlist = pk.load(f)
             
             # 현재 로그인한 사용자 정보 찾기 (최신 데이터)

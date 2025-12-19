@@ -3,6 +3,7 @@ from tkinter import messagebox
 import pickle as pk
 import os
 from user import Patient
+from data_paths import USERLIST_PATH
 
 class ViewRequest(Frame):
     
@@ -11,7 +12,7 @@ class ViewRequest(Frame):
         response = messagebox.askyesno("확인", "모든 요청을 확인 처리(삭제) 하시겠습니까?")
         if not response: return
 
-        file_path = '..//Datas//userlist.bin'
+        file_path = USERLIST_PATH
 
         try:
             with open(file_path, 'rb') as f:
@@ -59,7 +60,7 @@ class ViewRequest(Frame):
 
     def load_all_requests(self):
         # ... (이 부분은 기존 코드와 동일합니다) ...
-        file_path = '..//Datas//userlist.bin'
+        file_path = USERLIST_PATH
 
         try:
             with open(file_path, 'rb') as f:

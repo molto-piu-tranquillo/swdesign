@@ -2,6 +2,7 @@ DEBUG = False
 
 from tkinter import *
 from tkinter import messagebox
+from tkinter import ttk
 import pickle as pk
 
 from user import *

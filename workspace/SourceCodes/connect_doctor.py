@@ -58,6 +58,8 @@ class ConnectPatientFromDoctorFrame(Frame): # 의사 입장에서 관리 환자 
         for i in range(len(userlist)):
             if userlist[i].getId() == self.patientIdEntry.get():
                 userlist[i].setMainDoctorId(self.__doctor.getId())
+            if userlist[i].getId() == self.__doctor.getId():
+                userlist[i] = self.__doctor
                 break
 
         userlistFile = open(USERLIST_PATH, mode = 'wb')

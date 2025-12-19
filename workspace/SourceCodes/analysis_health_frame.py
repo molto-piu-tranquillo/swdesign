@@ -77,6 +77,9 @@ class AnalysisFrame(Frame):
         self.bloodSugarInfoLabel.config(text = '혈당: {}mg/dL'.format(dataList[self.__lastDataIndex].getBloodSugar()))
         self.smokeInfoLabel.config(text = '흡연 여부: {}'.format(boolToStr(dataList[self.__lastDataIndex].getSmoke())))
         self.alchoholInfoLabel.config(text = '음주 여부: {}'.format(boolToStr(dataList[self.__lastDataIndex].getAlchohol())))
+        self.heartDiseaseInfoLabel.config(text = '심장질환: {}'.format(boolToStr(dataList[self.__lastDataIndex].getHeartDisease())))
+        self.heightWeightInfoLabel.config(text = '키/체중: {}cm / {}kg (BMI: {:.1f})'.format(\
+                dataList[self.__lastDataIndex].getHeight(), dataList[self.__lastDataIndex].getWeight(), dataList[self.__lastDataIndex].getBMI()))
         self.carboKcalInfoLabel.config(text = '● 탄수화물: {}kcal'.format(dataList[self.__lastDataIndex].getCarboKcal()))
         self.proteinKcalInfoLabel.config(text = '● 단백질: {}kcal'.format(dataList[self.__lastDataIndex].getProteinKcal()))
         self.fatKcalInfoLabel.config(text = '● 지방: {}kcal'.format(dataList[self.__lastDataIndex].getFatKcal()))
@@ -111,13 +114,18 @@ class AnalysisFrame(Frame):
             else:
                 return '아니오'
         self.bloodPressureInfoLabel = Label(self, text = '혈압: {}/{}mmHg'.format(dataList[self.__lastDataIndex].getBloodPressure()[0], dataList[self.__lastDataIndex].getBloodPressure()[1]),\
-                font = ('Arial', 15, 'bold'), background = '#09FFFA')
+                font = ('Arial', 13, 'bold'), background = '#09FFFA')
         self.bloodSugarInfoLabel = Label(self, text = '혈당: {}mg/dL'.format(dataList[self.__lastDataIndex].getBloodSugar()),\
-                font = ('Arial', 15, 'bold'), background = '#09FFFA')
+                font = ('Arial', 13, 'bold'), background = '#09FFFA')
         self.smokeInfoLabel = Label(self, text = '흡연 여부: {}'.format(boolToStr(dataList[self.__lastDataIndex].getSmoke())),\
-                font = ('Arial', 15, 'bold'), background = '#09FFFA')
+                font = ('Arial', 13, 'bold'), background = '#09FFFA')
         self.alchoholInfoLabel = Label(self, text = '음주 여부: {}'.format(boolToStr(dataList[self.__lastDataIndex].getAlchohol())),\
-                font = ('Arial', 15, 'bold'), background = '#09FFFA')
+                font = ('Arial', 13, 'bold'), background = '#09FFFA')
+        self.heartDiseaseInfoLabel = Label(self, text = '심장질환: {}'.format(boolToStr(dataList[self.__lastDataIndex].getHeartDisease())),\
+                font = ('Arial', 13, 'bold'), background = '#09FFFA')
+        self.heightWeightInfoLabel = Label(self, text = '키/체중: {}cm / {}kg (BMI: {:.1f})'.format(\
+                dataList[self.__lastDataIndex].getHeight(), dataList[self.__lastDataIndex].getWeight(), dataList[self.__lastDataIndex].getBMI()),\
+                font = ('Arial', 13, 'bold'), background = '#09FFFA')
         self.carboKcalInfoLabel = Label(self, text = '● 탄수화물: {}kcal'.format(dataList[self.__lastDataIndex].getCarboKcal()),\
                 font = ('Arial', 10, 'bold'), background = '#09FFFA')
         self.proteinKcalInfoLabel = Label(self, text = '● 단백질: {}kcal'.format(dataList[self.__lastDataIndex].getProteinKcal()),\
@@ -126,19 +134,21 @@ class AnalysisFrame(Frame):
                 font = ('Arial', 10, 'bold'), background = '#09FFFA')
         self.eatKcalLabel = Label(self,\
                 text = '하루 총 섭취량: {}kcal'.format(dataList[self.__lastDataIndex].getCarboKcal() + dataList[self.__lastDataIndex].getProteinKcal() + dataList[self.__lastDataIndex].getFatKcal()),\
-                font = ('Arial', 15, 'bold'), background = '#09FFFA')
+                font = ('Arial', 13, 'bold'), background = '#09FFFA')
         self.exerciseKcalInfoLabel = Label(self, text = '활동량: {}kcal'.format(dataList[self.__lastDataIndex].getExerciseKcal()),\
-                font = ('Arial', 15, 'bold'), background = '#09FFFA')
+                font = ('Arial', 13, 'bold'), background = '#09FFFA')
 
-        self.bloodPressureInfoLabel.place(x = 125, y = 250)
-        self.bloodSugarInfoLabel.place(x = 125, y = 300)
-        self.smokeInfoLabel.place(x = 125, y = 350)
-        self.alchoholInfoLabel.place(x = 125, y = 400)
-        self.eatKcalLabel.place(x = 125, y = 450)
-        self.carboKcalInfoLabel.place(x = 125, y = 475)
-        self.proteinKcalInfoLabel.place(x = 125, y = 495)
-        self.fatKcalInfoLabel.place(x = 125, y = 515)
-        self.exerciseKcalInfoLabel.place(x = 125, y = 565)
+        self.bloodPressureInfoLabel.place(x = 125, y = 230)
+        self.bloodSugarInfoLabel.place(x = 125, y = 265)
+        self.smokeInfoLabel.place(x = 125, y = 300)
+        self.alchoholInfoLabel.place(x = 125, y = 335)
+        self.heartDiseaseInfoLabel.place(x = 125, y = 370)
+        self.heightWeightInfoLabel.place(x = 125, y = 405)
+        self.eatKcalLabel.place(x = 125, y = 455)
+        self.carboKcalInfoLabel.place(x = 125, y = 480)
+        self.proteinKcalInfoLabel.place(x = 125, y = 500)
+        self.fatKcalInfoLabel.place(x = 125, y = 520)
+        self.exerciseKcalInfoLabel.place(x = 125, y = 560)
 
         def calcDanger(): # 위험도를 계산하는 메소드
             danger: int = 0
@@ -150,6 +160,8 @@ class AnalysisFrame(Frame):
         self.bloodSugarInfoLabel.place_forget()
         self.smokeInfoLabel.place_forget()
         self.alchoholInfoLabel.place_forget()
+        self.heartDiseaseInfoLabel.place_forget()
+        self.heightWeightInfoLabel.place_forget()
         self.eatKcalLabel.place_forget()
         self.carboKcalInfoLabel.place_forget(); self.proteinKcalInfoLabel.place_forget(); self.fatKcalInfoLabel.place_forget()
         self.exerciseKcalInfoLabel.place_forget()
@@ -255,8 +267,40 @@ class AnalysisFrame(Frame):
                 messagebox.showerror('오류', '활동량은 정수로 입력하세요.')
                 return
 
+        if self.heartDiseaseEntry.get() == '':
+            messagebox.showerror('오류', '심장질환 여부가 입력되지 않았습니다.')
+            return
+        else:
+            if self.heartDiseaseEntry.get() == '네':
+                savedHeartDisease = True
+            elif self.heartDiseaseEntry.get() == '아니오':
+                savedHeartDisease = False
+            else:
+                messagebox.showerror('오류', '네 또는 아니오로 입력하세요.')
+                return
+
+        if self.heightEntry.get() == '':
+            messagebox.showerror('오류', '키가 입력되지 않았습니다.')
+            return
+        else:
+            try:
+                savedHeight = float(self.heightEntry.get())
+            except ValueError:
+                messagebox.showerror('오류', '키는 숫자로 입력하세요.')
+                return
+
+        if self.weightEntry.get() == '':
+            messagebox.showerror('오류', '체중이 입력되지 않았습니다.')
+            return
+        else:
+            try:
+                savedWeight = float(self.weightEntry.get())
+            except ValueError:
+                messagebox.showerror('오류', '체중은 숫자로 입력하세요.')
+                return
+
         savedData = Data(savedYear, savedMonth, savedDay, [highBloodPressure, lowBloodPressure], savedBloodSugar, savedSmoke, savedAlchohol,\
-                savedCarboKcal, savedProteinKcal, savedFatKcal, savedExerciseKcal)
+                savedCarboKcal, savedProteinKcal, savedFatKcal, savedExerciseKcal, savedHeight, savedWeight, savedHeartDisease)
         self.__patient.addData(savedData)
 
         # 데이터가 입력되면 userlist.bin 파일을 변경해야 함.
@@ -284,6 +328,9 @@ class AnalysisFrame(Frame):
         self.bloodSugarLabel.place_forget(); self.bloodSugarEntry.place_forget()
         self.smokeLabel.place_forget(); self.smokeEntry.place_forget()
         self.alchoholLabel.place_forget(); self.alchoholEntry.place_forget()
+        self.heartDiseaseLabel.place_forget(); self.heartDiseaseEntry.place_forget()
+        self.heightLabel.place_forget(); self.heightEntry.place_forget()
+        self.weightLabel.place_forget(); self.weightEntry.place_forget()
         self.eatKcalLabel.place_forget()
         self.carboKcalLabel.place_forget(); self.carboKcalEntry.place_forget()
         self.proteinKcalLabel.place_forget(); self.proteinKcalEntry.place_forget()
@@ -313,37 +360,46 @@ class AnalysisFrame(Frame):
         self.monthLabel.place(x = 350, y = 230); self.monthEntry.place(x = 400, y = 230)
         self.dayLabel.place(x = 500, y = 230); self.dayEntry.place(x = 550, y = 230)
 
-        self.bloodPressureLabel = Label(self, text = '혈압\n(수축기/이완기)', font = ('Arial', 13, 'bold'), background = '#09FFFA')
-        self.bloodSugarLabel = Label(self, text = '혈당', font = ('Arial', 15, 'bold'), background = '#09FFFA')
-        self.smokeLabel = Label(self, text = '흡연\n(네/아니오)', font = ('Arial', 13, 'bold'), background = '#09FFFA')
-        self.alchoholLabel = Label(self, text = '음주\n(네/아니오)', font = ('Arial', 13, 'bold'), background = '#09FFFA')
-        self.eatKcalLabel = Label(self, text = '하루 섭취량', font = ('Arial', 15, 'bold'), background = '#09FFFA')
-        self.carboKcalLabel = Label(self, text = '탄수화물(kcal)', font = ('Arial', 12, 'bold'), background = '#09FFFA')
-        self.proteinKcalLabel = Label(self, text = '단백질(kcal)', font = ('Arial', 12, 'bold'), background = '#09FFFA')
-        self.fatKcalLabel = Label(self, text = '지방(kcal)', font = ('Arial', 12, 'bold'), background = '#09FFFA')
-        self.exerciseKcalLabel = Label(self, text = '활동량(kcal)', font = ('Arial', 13, 'bold'), background = '#09FFFA')
+        self.bloodPressureLabel = Label(self, text = '혈압\n(수축기/이완기)', font = ('Arial', 11, 'bold'), background = '#09FFFA')
+        self.bloodSugarLabel = Label(self, text = '혈당', font = ('Arial', 13, 'bold'), background = '#09FFFA')
+        self.smokeLabel = Label(self, text = '흡연\n(네/아니오)', font = ('Arial', 11, 'bold'), background = '#09FFFA')
+        self.alchoholLabel = Label(self, text = '음주\n(네/아니오)', font = ('Arial', 11, 'bold'), background = '#09FFFA')
+        self.heartDiseaseLabel = Label(self, text = '심장질환\n(네/아니오)', font = ('Arial', 11, 'bold'), background = '#09FFFA')
+        self.heightLabel = Label(self, text = '키(cm)', font = ('Arial', 13, 'bold'), background = '#09FFFA')
+        self.weightLabel = Label(self, text = '체중(kg)', font = ('Arial', 13, 'bold'), background = '#09FFFA')
+        self.eatKcalLabel = Label(self, text = '하루 섭취량', font = ('Arial', 13, 'bold'), background = '#09FFFA')
+        self.carboKcalLabel = Label(self, text = '탄수화물(kcal)', font = ('Arial', 10, 'bold'), background = '#09FFFA')
+        self.proteinKcalLabel = Label(self, text = '단백질(kcal)', font = ('Arial', 10, 'bold'), background = '#09FFFA')
+        self.fatKcalLabel = Label(self, text = '지방(kcal)', font = ('Arial', 10, 'bold'), background = '#09FFFA')
+        self.exerciseKcalLabel = Label(self, text = '활동량(kcal)', font = ('Arial', 11, 'bold'), background = '#09FFFA')
 
         self.inputDatasLabel = Label(self, text = '건강 데이터를 입력하세요.', font = ('Arial', 25, 'bold'), background = '#09FFFA')
         self.inputDatasLabel.place(x = 200, y = 100)
 
-        self.bloodPressureEntry = Entry(self, font = ('Arial', 15, 'bold'), width = 30)
-        self.bloodSugarEntry = Entry(self, font = ('Arial', 15, 'bold'), width = 30)
-        self.smokeEntry = Entry(self, font = ('Arial', 15, 'bold'), width = 30)
-        self.alchoholEntry = Entry(self, font = ('Arial', 15, 'bold'), width = 30)
-        self.carboKcalEntry = Entry(self, font = ('Arial', 15, 'bold'), width = 9)
-        self.proteinKcalEntry = Entry(self, font = ('Arial', 15, 'bold'), width = 9)
-        self.fatKcalEntry = Entry(self, font = ('Arial', 15, 'bold'), width = 9)
-        self.exerciseKcalEntry = Entry(self, font = ('Arial', 15, 'bold'), width = 30)
+        self.bloodPressureEntry = Entry(self, font = ('Arial', 13, 'bold'), width = 25)
+        self.bloodSugarEntry = Entry(self, font = ('Arial', 13, 'bold'), width = 25)
+        self.smokeEntry = Entry(self, font = ('Arial', 13, 'bold'), width = 25)
+        self.alchoholEntry = Entry(self, font = ('Arial', 13, 'bold'), width = 25)
+        self.heartDiseaseEntry = Entry(self, font = ('Arial', 13, 'bold'), width = 25)
+        self.heightEntry = Entry(self, font = ('Arial', 13, 'bold'), width = 10)
+        self.weightEntry = Entry(self, font = ('Arial', 13, 'bold'), width = 10)
+        self.carboKcalEntry = Entry(self, font = ('Arial', 13, 'bold'), width = 8)
+        self.proteinKcalEntry = Entry(self, font = ('Arial', 13, 'bold'), width = 8)
+        self.fatKcalEntry = Entry(self, font = ('Arial', 13, 'bold'), width = 8)
+        self.exerciseKcalEntry = Entry(self, font = ('Arial', 13, 'bold'), width = 25)
 
-        self.bloodPressureLabel.place(x = 160, y = 290); self.bloodPressureEntry.place(x = 300, y = 300)
-        self.bloodSugarLabel.place(x = 200, y = 350); self.bloodSugarEntry.place(x = 300, y = 350)
-        self.smokeLabel.place(x = 180, y = 390); self.smokeEntry.place(x = 300, y = 400)
-        self.alchoholLabel.place(x = 180, y = 440); self.alchoholEntry.place(x = 300, y = 450)
-        self.eatKcalLabel.place(x = 170, y = 525)
-        self.carboKcalLabel.place(x = 300, y = 515); self.carboKcalEntry.place(x = 300, y = 545)
-        self.proteinKcalLabel.place(x = 415, y = 515); self.proteinKcalEntry.place(x = 415, y = 545)
-        self.fatKcalLabel.place(x = 530, y = 515); self.fatKcalEntry.place(x = 530, y = 545)
-        self.exerciseKcalLabel.place(x = 175, y = 600); self.exerciseKcalEntry.place(x = 300, y = 600)
+        self.bloodPressureLabel.place(x = 160, y = 270); self.bloodPressureEntry.place(x = 280, y = 280)
+        self.bloodSugarLabel.place(x = 200, y = 320); self.bloodSugarEntry.place(x = 280, y = 320)
+        self.smokeLabel.place(x = 180, y = 355); self.smokeEntry.place(x = 280, y = 365)
+        self.alchoholLabel.place(x = 180, y = 400); self.alchoholEntry.place(x = 280, y = 410)
+        self.heartDiseaseLabel.place(x = 170, y = 445); self.heartDiseaseEntry.place(x = 280, y = 455)
+        self.heightLabel.place(x = 200, y = 500); self.heightEntry.place(x = 280, y = 500)
+        self.weightLabel.place(x = 420, y = 500); self.weightEntry.place(x = 510, y = 500)
+        self.eatKcalLabel.place(x = 170, y = 560)
+        self.carboKcalLabel.place(x = 280, y = 545); self.carboKcalEntry.place(x = 280, y = 570)
+        self.proteinKcalLabel.place(x = 390, y = 545); self.proteinKcalEntry.place(x = 390, y = 570)
+        self.fatKcalLabel.place(x = 500, y = 545); self.fatKcalEntry.place(x = 500, y = 570)
+        self.exerciseKcalLabel.place(x = 170, y = 620); self.exerciseKcalEntry.place(x = 280, y = 620)
 
         self.saveDataButton = Button(self, text = '저장', font = ('Arial', 15, 'bold'),\
                 background = 'yellow', width = 8, command = lambda: self.saveDatas())
@@ -360,6 +416,9 @@ class AnalysisFrame(Frame):
         self.bloodSugarLabel.place_forget(); self.bloodSugarEntry.place_forget()
         self.smokeLabel.place_forget(); self.smokeEntry.place_forget()
         self.alchoholLabel.place_forget(); self.alchoholEntry.place_forget()
+        self.heartDiseaseLabel.place_forget(); self.heartDiseaseEntry.place_forget()
+        self.heightLabel.place_forget(); self.heightEntry.place_forget()
+        self.weightLabel.place_forget(); self.weightEntry.place_forget()
         self.eatKcalLabel.place_forget()
         self.carboKcalLabel.place_forget(); self.carboKcalEntry.place_forget()
         self.proteinKcalLabel.place_forget(); self.proteinKcalEntry.place_forget()

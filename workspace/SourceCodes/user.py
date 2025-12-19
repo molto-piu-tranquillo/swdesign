@@ -5,7 +5,7 @@ import datetime as dt
 class Data:
     def __init__(self, year: int = 0, month: int = 0, day: int = 0, bloodPressure: list[int] = [0, 0], bloodSugar: int = 0,\
                 smoke: bool = False, alchohol: bool = False, carboKcal: int = 0, proteinKcal: int = 0,\
-                fatKcal: int = 0, exerciseKcal: int = 0):
+                fatKcal: int = 0, exerciseKcal: int = 0, height: float = 0.0, weight: float = 0.0, heartDisease: bool = False):
         self.__year = year
         self.__month = month
         self.__day = day
@@ -18,6 +18,9 @@ class Data:
         self.__proteinKcal = proteinKcal
         self.__fatKcal = fatKcal
         self.__exerciseKcal = exerciseKcal
+        self.__height = height # 키 (cm)
+        self.__weight = weight # 체중 (kg)
+        self.__heartDisease = heartDisease # 심장질환 여부
 
     def setYear(self, year: int) -> None:
         self.__year = year
@@ -84,6 +87,32 @@ class Data:
 
     def getExerciseKcal(self) -> int:
         return self.__exerciseKcal
+
+    def setHeight(self, height: float) -> None:
+        self.__height = height
+
+    def getHeight(self) -> float:
+        return self.__height
+
+    def setWeight(self, weight: float) -> None:
+        self.__weight = weight
+
+    def getWeight(self) -> float:
+        return self.__weight
+
+    def setHeartDisease(self, heartDisease: bool) -> None:
+        self.__heartDisease = heartDisease
+
+    def getHeartDisease(self) -> bool:
+        return self.__heartDisease
+
+    def getBMI(self) -> float:
+        height = self.getHeight()
+        weight = self.getWeight()
+        if height <= 0:
+            return 0.0
+        heightM = height / 100  # cm -> m
+        return weight / (heightM * heightM)
 
 class User:
     def __init__(self, name: str, age: int, gender: str, id: str, pw: str,\
@@ -161,7 +190,8 @@ class Patient(User): # 일반 사용자(환자) 클래스
         self.__mainDocterId: str = '' # 주치의 아이디
         self.__friendIdList: list[str] = [] # 친구 목록
 
-        self.__incentiveScore = 0 # 인센티브 점수
+        self.__incentiveScore = 0 # 인센티브 점수 (의사가 개선 보상으로 부여)
+        self.__riskScore = 0 # 위험도 점수 (건강 상태 평가)
         self.__badgeCount = 0 # 뱃지 개수
 
         self.__contentList: list[str] = [] # 콘텐츠 리스트
@@ -249,6 +279,14 @@ class Patient(User): # 일반 사용자(환자) 클래스
 
     def getIncentiveScore(self) -> int:
         return self.__incentiveScore
+
+    def setRiskScore(self, riskScore: int) -> None:
+        self.__riskScore = riskScore
+
+    def getRiskScore(self) -> int:
+        if not hasattr(self, '_Patient__riskScore'):
+            self.__riskScore = 0
+        return self.__riskScore
 
     def getContentList(self) -> list[str]:
         return self.__contentList

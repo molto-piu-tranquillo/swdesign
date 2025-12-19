@@ -6,9 +6,22 @@ from tkinter import *
 from tkinter import messagebox
 import pickle as pk
 import matplotlib.pyplot as plt
+from math import exp
 
 from user import *
 from data_paths import USERLIST_PATH
+
+# 확률 계산에 로지스틱 모델 사용
+def calculateRiskProbability(age: int, hypertension: int, heartDisease: int,
+                              avgGlucoseLevel: float, bmi: float) -> float:
+    z = (0.03 * age
+         + 0.9 * hypertension
+         + 1.1 * heartDisease
+         + 0.012 * avgGlucoseLevel
+         + 0.05 * bmi
+         - 7.0)
+    prob = 1.0 / (1.0 + exp(-z))
+    return max(0.0, min(1.0, prob))
 
 class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
     GENERAL_INFO = 0
@@ -167,96 +180,79 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
         if len(self.__patient.getDataList()) == 0:
             return
 
-        totalDanger: int = 0 # 전체 위험도 수치
-        bloodPressureDanger: int = 0 # 혈압 위험도
-        bloodSugarDanger: int = 0 # 혈당 위험도
-        smokeDanger: int = 0 # 흡연 위험도
-        alchoholDanger: int = 0 # 음주 위험도
-        eatDanger: int = 0 # 식단 위험도
-        exerciseDanger: int = 0 # 활동량 위험도
-
         dataList: list[Data] = self.__patient.getDataList()
         lastData: Data = dataList[len(dataList) - 1]
 
-        # 1. 혈압 위험도 계산
-        if lastData.getBloodPressure()[0] >= 140 or lastData.getBloodPressure()[1] >= 90:
-            bloodPressureDanger += 2
-        elif lastData.getBloodPressure()[0] >= 120 or lastData.getBloodPressure()[1] >= 80:
-            bloodPressureDanger += 1
-        # 2. 혈당 위험도 계산
-        if lastData.getBloodSugar() >= 200:
-            bloodSugarDanger += 2
-        elif lastData.getBloodSugar() >= 140:
-            bloodSugarDanger += 1
-        # 3. 흡연/음주 위험도 계산
-        if lastData.getSmoke():
-            smokeDanger += 1
-        if lastData.getAlchohol():
-            alchoholDanger += 1
-        # 4. 식단 위험도 계산
-        if self.__patient.getGender() == '남':
-            if lastData.getCarboKcal() + lastData.getProteinKcal() + lastData.getFatKcal() >= 2500:
-                eatDanger += 1
-        elif self.__patient.getGender() == '여':
-            if lastData.getCarboKcal() + lastData.getProteinKcal() + lastData.getFatKcal() >= 2000:
-                eatDanger += 1
-        # 5. 활동량 위험도 계산
-        if lastData.getExerciseKcal() < 300:
-            exerciseDanger += 1
+        # 로지스틱 모델 입력값 준비
+        age: int = self.__patient.getAge()
+        hypertension: int = 1 if (lastData.getBloodPressure()[0] >= 140 or lastData.getBloodPressure()[1] >= 90) else 0
+        heartDisease: int = 1 if lastData.getHeartDisease() else 0
+        avgGlucoseLevel: float = float(lastData.getBloodSugar())
+        bmi: float = lastData.getBMI()
 
-        # => 전체 위험도 계산
-        totalDanger += (bloodPressureDanger + bloodSugarDanger + smokeDanger + alchoholDanger + eatDanger + exerciseDanger)
+        # 로지스틱 모델로 위험도 확률 계산
+        riskProb: float = calculateRiskProbability(age, hypertension, heartDisease, avgGlucoseLevel, bmi)
 
         def boolToStr(value: bool) -> str:
-            result: str = ''
-            if value:
-                result += '네'
-            else:
-                result += '아니오'
-            return result
+            return '네' if value else '아니오'
 
         self.analysisResultLabel = Label(self, text = '위험도', font = ('Arial', 17, 'bold'), bg = 'white')
 
+        # 기본 건강 지표
         self.bloodPressureResultLabel = Label(self,\
                 text = '혈압(수축기/이완기): {}/{}'.format(lastData.getBloodPressure()[0], lastData.getBloodPressure()[1]),\
-                font = ('Arial', 15, 'bold'), bg = 'white')
-        if bloodPressureDanger > 0:
+                font = ('Arial', 12, 'bold'), bg = 'white')
+        if hypertension:
             self.bloodPressureResultLabel.config(fg = 'red', text = '⚠️ ' + self.bloodPressureResultLabel.cget('text'))
-        
+
         self.bloodSugarResultLabel = Label(self,\
-                text = '혈당: {}mg/dL'.format(lastData.getBloodSugar()), font = ('Arial', 15, 'bold'), bg = 'white')
-        if bloodSugarDanger > 0:
+                text = '혈당: {}mg/dL'.format(lastData.getBloodSugar()), font = ('Arial', 12, 'bold'), bg = 'white')
+        if avgGlucoseLevel >= 140:
             self.bloodSugarResultLabel.config(fg = 'red', text = '⚠️ ' + self.bloodSugarResultLabel.cget('text'))
 
         self.smokeResultLabel = Label(self,\
-                text = '흡연 여부: {}'.format(boolToStr(lastData.getSmoke())), font = ('Arial', 15, 'bold'), bg = 'white')
-        if smokeDanger > 0:
+                text = '흡연 여부: {}'.format(boolToStr(lastData.getSmoke())), font = ('Arial', 12, 'bold'), bg = 'white')
+        if lastData.getSmoke():
             self.smokeResultLabel.config(fg = 'red', text = '⚠️ ' + self.smokeResultLabel.cget('text'))
 
         self.alchoholResultLabel = Label(self,\
-                text = '음주 여부: {}'.format(boolToStr(lastData.getAlchohol())), font = ('Arial', 15, 'bold'), bg = 'white')
-        if alchoholDanger > 0:
+                text = '음주 여부: {}'.format(boolToStr(lastData.getAlchohol())), font = ('Arial', 12, 'bold'), bg = 'white')
+        if lastData.getAlchohol():
             self.alchoholResultLabel.config(fg = 'red', text = '⚠️ ' + self.alchoholResultLabel.cget('text'))
 
+        totalKcal = lastData.getCarboKcal() + lastData.getProteinKcal() + lastData.getFatKcal()
+        kcalLimit = 2500 if self.__patient.getGender() == '남' else 2000
         self.eatResultLabel = Label(self,\
-                text = '섭취량: {}kcal'.format(lastData.getCarboKcal() + lastData.getProteinKcal() + lastData.getFatKcal()),\
-                font = ('Arial', 15, 'bold'), bg = 'white')
-        if eatDanger > 0:
+                text = '섭취량: {}kcal'.format(totalKcal), font = ('Arial', 12, 'bold'), bg = 'white')
+        if totalKcal >= kcalLimit:
             self.eatResultLabel.config(fg = 'red', text = '⚠️ ' + self.eatResultLabel.cget('text'))
 
         self.exerciseResultLabel = Label(self,\
-                text = '활동량: {}kcal'.format(lastData.getExerciseKcal()), font = ('Arial', 15, 'bold'), bg = 'white')
-        if exerciseDanger > 0:
+                text = '활동량: {}kcal'.format(lastData.getExerciseKcal()), font = ('Arial', 12, 'bold'), bg = 'white')
+        if lastData.getExerciseKcal() < 300:
             self.exerciseResultLabel.config(fg = 'red', text = '⚠️ ' + self.exerciseResultLabel.cget('text'))
 
+        # 로지스틱 모델 지표
+        self.heartDiseaseResultLabel = Label(self,\
+                text = '심장질환: {}'.format(boolToStr(lastData.getHeartDisease())), font = ('Arial', 12, 'bold'), bg = 'white')
+        if heartDisease:
+            self.heartDiseaseResultLabel.config(fg = 'red', text = '⚠️ ' + self.heartDiseaseResultLabel.cget('text'))
+
+        self.bmiResultLabel = Label(self,\
+                text = 'BMI: {:.1f} (키: {}cm, 체중: {}kg)'.format(bmi, lastData.getHeight(), lastData.getWeight()),\
+                font = ('Arial', 12, 'bold'), bg = 'white')
+        if bmi >= 25:
+            self.bmiResultLabel.config(fg = 'red', text = '⚠️ ' + self.bmiResultLabel.cget('text'))
+
+        # 위험도 결과
         self.totalResultLabel = Label(self,\
-                text = '위험도: ', font = ('Arial', 15, 'bold'), bg = 'white')
-        if totalDanger == 0:
-            self.totalResultLabel.config(text = self.totalResultLabel.cget('text') + '안전', fg = 'green')
-        elif totalDanger < 4:
-            self.totalResultLabel.config(text = self.totalResultLabel.cget('text') + '주의', fg = 'orange')
+                text = '위험도: ', font = ('Arial', 14, 'bold'), bg = 'white')
+        if riskProb < 0.3:
+            self.totalResultLabel.config(text = self.totalResultLabel.cget('text') + '안전 ({:.1%})'.format(riskProb), fg = 'green')
+        elif riskProb < 0.5:
+            self.totalResultLabel.config(text = self.totalResultLabel.cget('text') + '주의 ({:.1%})'.format(riskProb), fg = 'orange')
         else:
-            self.totalResultLabel.config(text = '⚠️ ' + self.totalResultLabel.cget('text') + '위험', fg = 'red')
+            self.totalResultLabel.config(text = '⚠️ ' + self.totalResultLabel.cget('text') + '위험 ({:.1%})'.format(riskProb), fg = 'red')
 
     def makeDataListGraph(self, dataType: int): # 건강 데이터 추이에 대한 그래프를 그리는 메소드
         dataList: list[Data] = self.__patient.getDataList()
@@ -454,16 +450,18 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
 
         self.analysisResultLabel.place(x = 270, y = 30)
 
-        self.bloodPressureResultLabel.place(x = 50, y = 100)
-        self.bloodSugarResultLabel.place(x = 50, y = 140)
-        self.smokeResultLabel.place(x = 50, y = 180)
-        self.alchoholResultLabel.place(x = 50, y = 220)
-        self.eatResultLabel.place(x = 50, y = 260)
-        self.exerciseResultLabel.place(x = 50, y = 300)
-        self.lineLabel = Label(self, text = '---------------------------------------------------------------------',\
-                font = ('Arial', 15, 'bold'), bg = 'white')
-        self.lineLabel.place(x = 50, y = 340)
-        self.totalResultLabel.place(x = 50, y = 380)
+        self.bloodPressureResultLabel.place(x = 50, y = 80)
+        self.bloodSugarResultLabel.place(x = 50, y = 115)
+        self.smokeResultLabel.place(x = 50, y = 150)
+        self.alchoholResultLabel.place(x = 50, y = 185)
+        self.eatResultLabel.place(x = 50, y = 220)
+        self.exerciseResultLabel.place(x = 50, y = 255)
+        self.heartDiseaseResultLabel.place(x = 50, y = 290)
+        self.bmiResultLabel.place(x = 50, y = 325)
+        self.lineLabel = Label(self, text = '─' * 40,\
+                font = ('Arial', 12, 'bold'), bg = 'white')
+        self.lineLabel.place(x = 50, y = 360)
+        self.totalResultLabel.place(x = 50, y = 395)
 
     def hideRiskInfo(self): # 위험도 수치를 숨기는 메소드
         self.analysisResultLabel.place_forget()
@@ -474,6 +472,8 @@ class PatientInfoPanel(Frame): # 환자 정보를 보여주는 작은 패널
         self.alchoholResultLabel.place_forget()
         self.eatResultLabel.place_forget()
         self.exerciseResultLabel.place_forget()
+        self.heartDiseaseResultLabel.place_forget()
+        self.bmiResultLabel.place_forget()
         self.lineLabel.place_forget()
         self.totalResultLabel.place_forget()
 
